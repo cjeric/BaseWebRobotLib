@@ -4,6 +4,8 @@
 
 from Base import Base
 from selenium.webdriver.common.by import By
+from robot.api import logger
+from selenium.common.exceptions import NoSuchElementException
 import time
 
 
@@ -18,6 +20,7 @@ class MenuBar(Base):
         Make the menu tree display
         :return: None
         '''
+        logger.info('Toggle menu')
         self.find_element(*self.menu_button_loc).click()
 
     #Menu locators for different status
@@ -29,6 +32,7 @@ class MenuBar(Base):
         Click the Menu in the menu tree to back to the root level
         :return: None
         '''
+        logger.info('Back to root of menu tree')
         self.find_element(*self.menu_ancestor_loc).click()
 
     #Entry menu locator
@@ -41,11 +45,16 @@ class MenuBar(Base):
         :param groupName: The application group want to extend
         :return: None
         '''
+        logger.info('Extend application %s' % groupName)
         group_list = self.find_elements(*self.app_group_loc)
-        for group in group_list:
-            if group.text == groupName:
-                group.click()
-                break
+        if len(group_list)>0:
+            for group in group_list:
+                if group.text == groupName:
+                    logger.debug('Application %s is found' % group.text)
+                    group.click()
+                    return
+        raise NoSuchElementException ('Fail to expand app group. The application %s not found' % groupName)
+
     # The locator of the opened menu
     __current_open_menu_loc = (By.XPATH, '//li[@class="with-children current open"] | //li[@class="with-children open current"]')
     # The locator of the sub menu to extend
@@ -59,18 +68,22 @@ class MenuBar(Base):
         Expand the sub menu or open the page
         :param menu: The name of menu item
         :param isMenu: whether the link is a submenu
-        :return:
+        :return: None
         '''
+        logger.info('Extend submenu or open page ')
         open_menu = self.wait_UI(self.__current_open_menu_loc)
         if isMenu:
             menu_items_loc = self.__menu_toextend_loc
         else:
             menu_items_loc = self.__page_toopen_loc
         menu_items = open_menu.find_elements(*menu_items_loc)
-        for menu_item in menu_items:
-            if menu_item.text == menu:
-                menu_item.click()
-                break
+        if len(menu_items)>0:
+            for menu_item in menu_items:
+                if menu_item.text == menu:
+                    logger.debug('Application %s is found' % menu_item.text)
+                    menu_item.click()
+                    return
+        raise NoSuchElementException('Fail to expand Menu or open page, %s not found' % menu)
 
     #The locator of the current opened menu's parent menus
     __ancestor_menu_loctor = (By.XPATH, '//li[@class="with-children open ancestor"]/a')
@@ -80,12 +93,16 @@ class MenuBar(Base):
         '''
         Collapse a specific menu, except the root Menu
         :param menuName: The menu want to be collapsed
-        :return:
+        :return: None
         '''
+        logger.info('collapse menu %s' % menu)
         menu_items = self.find_elements(*self.__ancestor_menu_loctor)
-        for menu_item in menu_items:
-            if menu_item.text == menu:
-                menu_item.click()
-                break
+        if len(menu_items)>0:
+            for menu_item in menu_items:
+                if menu_item.text == menu:
+                    logger.debug('menu item %s is found' % menu_item.text)
+                    menu_item.click()
+                    return
+        raise NoSuchElementException ('Fail to collapse menu. %s not found' % menu)
 
 

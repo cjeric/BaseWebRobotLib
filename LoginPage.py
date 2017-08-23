@@ -16,6 +16,12 @@ class LoginPage(Base):
 
     #Function to input username
     def __action_input_username(self, username='Administrator'):
+        '''
+        Input the username on HJ1 login page
+        :param username: string, default value is Administrator
+        :return: None
+        '''
+        logger.debug('Start to input username %s' % username)
         element = self.find_element(*self.username_loc)
         element.send_keys(username)
 
@@ -24,6 +30,12 @@ class LoginPage(Base):
 
     #Function to input password
     def __action_input_password(self, password='HJSPASS'):
+        '''
+        Input the password on HJ1 login page
+        :param password: string, default value is HJSPASS
+        :return: 
+        '''
+        logger.debug('Start to input password')
         self.find_element(*self.password_loc).send_keys(password)
 
     #tenant_locator
@@ -31,6 +43,12 @@ class LoginPage(Base):
 
     #Function to input tenant
     def __acton_input_tenant(self, tenant ='Tenant'):
+        '''
+        Input tenant on HJ1 login page
+        :param tenant: string, default value is Tenant
+        :return: 
+        '''
+        logger.debug('Start to input tenant %s' % tenant)
         self.find_element(*self.tenant_loc).send_keys(tenant)
 
     #language locator
@@ -39,6 +57,12 @@ class LoginPage(Base):
 
     #Function to select language
     def __action_select_language(self, language):
+        '''
+        select a language on HJ1 login page
+        :param language: string, language to select
+        :return: 
+        '''
+        logger.debug('Start to select %s language' % language)
         language_dropdown = self.find_element(*self.language_dropdown_loc)
         language_input = self.find_element(*self.language_input_loc)
         language_dropdown.click()
@@ -50,6 +74,11 @@ class LoginPage(Base):
 
     #Function to click Login button
     def __action_click_login(self):
+        '''
+        Click login button
+        :return: 
+        '''
+        logger.debug('Click login button')
         self.find_element(*self.__login_button_loc).click()
 
     # Menu button locator
