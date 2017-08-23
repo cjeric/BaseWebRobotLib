@@ -52,11 +52,23 @@ class LoginPage(Base):
     def __action_click_login(self):
         self.find_element(*self.__login_button_loc).click()
 
+    # Menu button locator
+    menu_button_loc = (By.ID, 'menuButtonToggle')
+
     # login in HJ1
     def login(self):
+        logger.info('Log on HJ1 by Administrator')
         self.open()
         self.wait_UI(self.username_loc)
         self.__action_input_username()
         self.__action_input_password()
         self.__action_click_login()
+        try:
+            self.wait_UI(self.menu_button_loc)
+        except:
+            logger.info('Login failed')
+            raise
+        else:
+            logger.info ('Login Successfully')
+
 

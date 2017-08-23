@@ -26,16 +26,19 @@ class Base(object):
         assert self.on_page(), 'Did not access to %s' % url
 
     def find_element(self, *locators):
-        logger.debug('find element %s by %s' %)
+        logger.debug('find element %s by %s' %(locators[1], locators[0]))
         return self.driver.find_element(*locators)
 
     def find_elements(self, *locators):
+        logger.debug('find elements %s by %s' % (locators[1], locators[0]))
         return self.driver.find_elements(*locators)
 
     def find_child_element(self, webelement, *locators):
+        logger.debug('find child element %s by %s under %s' % (locators[1], locators[0], webelement))
         return webelement.find_element(*locators)
 
     def find_child_elements(self, webelement, *locators):
+        logger.debug('find child elements %s by %s under %s' % (locators[1], locators[0], webelement))
         return webelement.find_elements(*locators)
 
     def open(self):
@@ -46,9 +49,10 @@ class Base(object):
         return self.driver.current_url == (self.base_url + self.url)
 
     def script(self, src):
+        logger.debug('run scripts %s' % src)
         return self.driver.execute_script(src)
 
     def wait_UI(self, *locators):
-        logger.debug(r'start Base.wati_UI')
+        logger.debug(r'wait UI %s by %s' %(locators[0][1], locators[0][0]))
         return WebDriverWait(self.driver, self.timeout, 0.5).until(EC.visibility_of_element_located(*locators))
 
