@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchAttributeException, NoSuchElementException
 from selenium.webdriver.support import select
+from robot.api import logger
 import time
 
 
@@ -20,10 +21,11 @@ class SearchPage(BasePage):
 
     def __get_field_cells_path(self, groupIndex):
         '''
-        Return hj-feild-cell css selector path according to the group index input.
+        Return hj-feild-cell css selector path according to the group index input. Index starts from 1   
         :param groupIndex: The field group user want
         :return: the css selector of all field group rows
         '''
+        logger.debug('Start to get css selector of all fields under groupIndex %d' % groupIndex)
         field_groups_list_length = len(self.find_elements(*self.__field_groups_loc))
         if not isinstance(groupIndex, int):
             raise ValueError ('groupIndex must be int')
@@ -47,6 +49,7 @@ class SearchPage(BasePage):
         :param name: The control's label name
         :return: Return the hj-field-control web element
         '''
+        logger.debug('Start to get hj-field-control (UI controller wraper of field %s)' % name)
         page_wrap = self.get_current_page_wrap() # Get the current displayed page wrap
         field_cell_loc =(By.CSS_SELECTOR, self.__get_field_cells_path(groupIndex))
         field_cells = self.find_child_elements(page_wrap,*field_cell_loc) #Get all hj-field-cell elements in the hj-field-table-row only in displayed page
@@ -73,6 +76,7 @@ class SearchPage(BasePage):
         Find all div<k-list-container>, but only return the one is displayed.
         :return: div<k-list-container>
         '''
+        logger.debug('Get current displayed list container (Find the current used dropdown list)')
         list_containers= self.find_elements(*self.__list_container_loc)
         for list_container in list_containers:
             if list_container.is_displayed():
@@ -84,6 +88,7 @@ class SearchPage(BasePage):
         dropdown list first
         :return: the items list
         '''
+        logger.debug('Get all items under the current displayed drop down list')
         list_container = self.__get_list_container()
         dropdown_list_items = self.find_child_elements(list_container, *self.__list_container_items_loc)
         if len(dropdown_list_items):
@@ -99,6 +104,7 @@ class SearchPage(BasePage):
         :param text: The item in dropdown list want to be selected
         :return: None
         '''
+        logger.debug('select %s in drop down list' % text)
         list_container = self.__get_list_container()
         dropdown_list_items = self.find_child_elements(list_container, *self.__list_container_items_loc)
         if len(dropdown_list_items):
@@ -116,6 +122,7 @@ class SearchPage(BasePage):
         :param groups_number: The number of field groups, default value is 1
         :return: a list contains all label names in the page
         '''
+        logger.info('Get all fields names on page')
         if not isinstance(groups_number, int):
             raise ValueError('groups_numbers must be int')
         name_list = []
@@ -143,6 +150,7 @@ class SearchPage(BasePage):
         :param name: The control's label name
         :return: hj-checkbox element
         '''
+        logger.debug('Get checkbox element by field name')
         field_control = self.__get_field_control(name, groupIndex)
         checkbox_element = self.find_child_element(field_control, *self.__checkbox_loc)
         if checkbox_element.get_attribute("type") == "checkbox":
@@ -157,6 +165,7 @@ class SearchPage(BasePage):
         :param name: The control's label name
         :return: None
         '''
+        logger.info(r'Check/uncheck checkbox %s' % name)
         checkbox_element = self.__get_checkbox_element(name, groupIndex)
         checkbox_element.click()
 
@@ -172,6 +181,7 @@ class SearchPage(BasePage):
         :param name: The control's label name
         :return: hj-textbox or hj-passowrd-textbox element
         '''
+        logger.debug('Get textbox element by field name')
         field_control = self.__get_field_control(name, groupIndex)
         edit_element = self.find_child_element(field_control, *self.__edit_loc)
         return edit_element
@@ -184,6 +194,7 @@ class SearchPage(BasePage):
         :param value: The value input
         :return: None
         '''
+        logger.info('Input %s to textbox %s' % (value, name))
         edit_element = self.__get_edit_element(name, groupIndex)
         edit_element.send_keys(value)
 
@@ -194,6 +205,7 @@ class SearchPage(BasePage):
         :param groupIndex: Integer: The field group the control located in, default is 1
         :return:
         '''
+        logger.info('Clear value in textbox %s' % name)
         edit_element = self.__get_edit_element(name, groupIndex)
         edit_element.clear()
 
@@ -209,6 +221,7 @@ class SearchPage(BasePage):
         :param name: The control's label name
         :return: hj-multieline-textbox element
         '''
+        logger.debug('Get multi textbox element')
         field_control = self.__get_field_control(name, groupIndex)
         multiedit_element = self.find_child_element(field_control, *self.__multiedit_loc)
         return multiedit_element
@@ -221,6 +234,7 @@ class SearchPage(BasePage):
         :param value: The value input
         :return: None
         '''
+        logger.info('Input %s to multi textbox %s' % (value, name))
         multiedit_element = self.__get_multiedit_element(name, groupIndex)
         multiedit_element.send_keys(value)
 
@@ -231,6 +245,7 @@ class SearchPage(BasePage):
         :param groupIndex: Integer: The field group the control located in, default is 1
         :return:
         '''
+        logger.info('Clear value in multi textbox %s' % name)
         multiedit_element = self.__get_multiedit_element(name, groupIndex)
         multiedit_element.clear()
 
@@ -249,6 +264,7 @@ class SearchPage(BasePage):
         :param name: The control's label name
         :return: The searchlike control components list
         '''
+        logger.debug('Get UI components in searchlike controller')
         searchlike_elements=[]
         for loc in self.__searchlike_locs:
             field_control = self.__get_field_control(name, groupIndex)
@@ -266,6 +282,7 @@ class SearchPage(BasePage):
         :param search_type: The search type in the dropdown list, default is like. The acceptable value, is Like, Exactly
         :return: None
         '''
+        logger.info('Search %s %s via searchlike %s' %(search_type, value, name))
         searchlike_elements = self.__get_searchlike_element(name, groupIndex)
         searchlike_elements[0].click()
         time.sleep(1)
@@ -279,6 +296,7 @@ class SearchPage(BasePage):
         :param groupIndex: Integer: The field group the control located in, default is 1
         :return:
         '''
+        logger.info('Clear textbox in searchlike %s' % name)
         searchlike_elements = self.__get_searchlike_element(name, groupIndex)
         searchlike_elements[1].clear()
 
@@ -294,6 +312,7 @@ class SearchPage(BasePage):
         :param groupIndex: The field group the control located in
         :return: drop down button element
         '''
+        logger.debug('Get button element in dropdown list')
         field_control = self.__get_field_control(name, groupIndex)
         dropdown_button = self.find_child_element(field_control, *self.__dropdown_button_loc)
        # dropdown_button = field_control.find_element_by_css_selector(self.__dropdown_button_loc)
@@ -306,6 +325,7 @@ class SearchPage(BasePage):
         :param groupIndex: The field group the control located in, default is 1
         :return:
         '''
+        logger.info('Get items in drop down list %s' % name)
         self.__get_dropdown_button_element(name, groupIndex).click()
         dropdown_options =  self.__get_list_container_items()
         self.__get_dropdown_button_element(name, groupIndex).click()
@@ -319,6 +339,7 @@ class SearchPage(BasePage):
         :param groupIndex: The field group the control located in, default is 1
         :return: None
         '''
+        logger.info('Select %s in drop down list %s' %(value, name))
         dropdown_button = self.__get_dropdown_button_element(name, groupIndex)
         dropdown_button.location_once_scrolled_into_view
         time.sleep(1)
@@ -337,6 +358,7 @@ class SearchPage(BasePage):
         :param groupIndex: The field group the control located in
         :return: calendar or calendar&time textbox element
         '''
+        logger.debug('Get textbox in drop down list')
         field_control = self.__get_field_control(name, groupIndex)
         calendar_textbox = self.find_child_element(field_control, *self.__dropdown_textbox_loc)
         return calendar_textbox
@@ -349,11 +371,16 @@ class SearchPage(BasePage):
         :param groupIndex: The field group the control located in, default is 1
         :return:
         '''
+        logger.info('Input %s to drop down list %s' % name)
         calendar_textbox = self.__get_dropdown_textbox_element(name, groupIndex)
         calendar_textbox.clear()
         calendar_textbox.send_keys(value)
 
-    def get_value(self):
+    def _get_value(self):
+        '''
+        Not finished
+        :return: string 
+        '''
         element = self.__get_edit_element('Edit', 2)
         print(element.get_attribute('value'))
 
@@ -369,6 +396,7 @@ class SearchPage(BasePage):
         :param groupIndex: Int. The field group the control located in.
         :return: Return listbox element
         '''
+        logger.debug('Get listbox web element')
         field_control = self.__get_field_control(name, groupIndex)
         listbox_control = self.find_child_element(field_control, *self.__listbox_loc)
         return listbox_control
@@ -381,6 +409,7 @@ class SearchPage(BasePage):
         :param groupIndex: The field group the control located in, default is 1
         :return:
         '''
+        logger.info('Select %s in listbox %s' %(value, name))
         listbox = select.Select(self.__get_listbox_element(name, groupIndex))
         listbox.select_by_visible_text(value)
 
@@ -396,6 +425,7 @@ class SearchPage(BasePage):
         :param groupIndex: Int. The field group the control located in.
         :return: label element
         '''
+        logger.debug('Get label web element')
         field_control = self.__get_field_control(name, groupIndex)
         label_control = self.find_child_element(field_control, *self.__label_loc)
         return label_control
@@ -408,13 +438,19 @@ class SearchPage(BasePage):
     def get_page_error(self):
         '''
         Get the page error hint value
-        :return:
+        :return: string, error message
         '''
+        logger.info('Get error message displayed under page title')
         return self.wait_UI(self.__page_error_loc).text
 
     __field_error_loc = (By.XPATH, '//span[@data-hj-test-id="field-error"]')
 
     def get_field_errors(self):
+        '''
+        Return a list of all fields error messages
+        :return: a list of text
+        '''
+        logger.info('Get error messages displayed on fields')
         self.wait_UI(self.__field_error_loc)
         field_errors = self.find_elements(*self.__field_error_loc)
         error_messages=[]

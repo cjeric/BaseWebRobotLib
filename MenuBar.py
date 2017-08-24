@@ -2,14 +2,14 @@
 #!c:/Python36
 #Filename: MenuBar.py
 
-from Base import Base
+from BasePage import BasePage
 from selenium.webdriver.common.by import By
 from robot.api import logger
 from selenium.common.exceptions import NoSuchElementException
 import time
 
 
-class MenuBar(Base):
+class MenuBar(BasePage):
     url = ''
 
     #Menu button locator
@@ -63,14 +63,14 @@ class MenuBar(Base):
     __page_toopen_loc = (By.XPATH, './/li[@class="without-children closed"]/a')
 
     # Click the submenu or page under the current opened menu
-    def action_expand_menu(self, menu, isMenu = True):
+    def action_expand_menu(self, menu, isMenu = True, title = None):
         '''
         Expand the sub menu or open the page
         :param menu: The name of menu item
         :param isMenu: whether the link is a submenu
         :return: None
         '''
-        logger.info('Extend submenu or open page ')
+        logger.info('Extend submenu or open page %s' % menu)
         open_menu = self.wait_UI(self.__current_open_menu_loc)
         if isMenu:
             menu_items_loc = self.__menu_toextend_loc
@@ -80,8 +80,11 @@ class MenuBar(Base):
         if len(menu_items)>0:
             for menu_item in menu_items:
                 if menu_item.text == menu:
-                    logger.debug('Application %s is found' % menu_item.text)
+                    logger.debug('Application %s is found and click it' % menu_item.text)
                     menu_item.click()
+                    if not isMenu and title is not None:
+                        logger.debug('Wait page to load')
+                        self.wait_page(title)
                     return
         raise NoSuchElementException('Fail to expand Menu or open page, %s not found' % menu)
 
