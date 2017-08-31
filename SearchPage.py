@@ -27,11 +27,12 @@ class SearchPage(BasePage):
         '''
         logger.debug('Start to get css selector of all fields under groupIndex %d' % groupIndex)
         field_groups_list_length = len(self.find_elements(*self.__field_groups_loc))
+        logger.debug('The total groups is %d' % field_groups_list_length)
         if not isinstance(groupIndex, int):
             raise ValueError ('groupIndex must be int')
         elif groupIndex>field_groups_list_length:
             print(field_groups_list_length)
-            raise IndexError ('The groupIndex is out of the number of groups')
+            raise IndexError ('The groupIndex %d is out of the number of groups %d' % (groupIndex, field_groups_list_length))
         field_group_rows_path = 'div[data-hj-test-id="field-table"]>hj-field-table-row:nth-of-type(' + str(groupIndex) \
                                 + ')>div[data-hj-test-id="field-table-row"]>hj-field-group>div[data-hj-test-id="field-group"]>div[data-hj-test-id="field-group-content"]>hj-field-group-row'
         field_cells_path = field_group_rows_path+'>div>hj-field-cell'
@@ -371,7 +372,7 @@ class SearchPage(BasePage):
         :param groupIndex: The field group the control located in, default is 1
         :return:
         '''
-        logger.info('Input %s to drop down list %s' % name)
+        logger.info('Input %s to drop down list %s' % (value,name))
         calendar_textbox = self.__get_dropdown_textbox_element(name, groupIndex)
         calendar_textbox.clear()
         calendar_textbox.send_keys(value)

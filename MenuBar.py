@@ -8,12 +8,12 @@ from robot.api import logger
 from selenium.common.exceptions import NoSuchElementException
 import time
 
-
 class MenuBar(BasePage):
     url = ''
 
+
     #Menu button locator
-    menu_button_loc = (By.ID,'menuButtonToggle')
+    __menu_button_loc = (By.ID, 'menuButtonToggle')
 
     def action_toggle_menu(self):
         '''
@@ -21,7 +21,7 @@ class MenuBar(BasePage):
         :return: None
         '''
         logger.info('Toggle menu')
-        self.find_element(*self.menu_button_loc).click()
+        self.find_element(*self.__menu_button_loc).click()
 
     #Menu locators for different status
     menu_current_loc = (By.XPATH, '//nav[@id="menu"]/ul/li[@class="home current"]/a')
@@ -33,10 +33,10 @@ class MenuBar(BasePage):
         :return: None
         '''
         logger.info('Back to root of menu tree')
-        self.find_element(*self.menu_ancestor_loc).click()
+        self.find_element(*self.__menu_ancestor_loc).click()
 
     #Entry menu locator
-    app_group_loc = (By.XPATH,'//nav[@id="menu"]/ul/li[@class="with-children closed"]/a')
+    app_group_loc = (By.XPATH, '//nav[@id="menu"]/ul/li[@class="with-children closed"]/a')
 
     #Extend app group
     def action_expand_app_group(self, groupName):

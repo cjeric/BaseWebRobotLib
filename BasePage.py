@@ -2,7 +2,7 @@
 # !c:/Python36
 # Filename: BasePage.py
 
-from Base import Base
+from Base import Base as _Base
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException,TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,8 +10,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from robot.api import logger
 import time
 
-class BasePage(Base):
+class BasePage(_Base):
     url = ''
+
     #TODO functions to operate page
 
     #The css selector of the current displayed page wrap
@@ -27,11 +28,11 @@ class BasePage(Base):
         return self.wait_UI(self.__page_wrap_loc)
 
     # page header locator
-    page_header_loc = (By.CSS_SELECTOR, 'div[data-hj-test-id="hj-active-thread-title"]')
+    __page_header_loc = (By.CSS_SELECTOR, 'div[data-hj-test-id="hj-active-thread-title"]')
     # Return the page header
     def get_header(self):
         logger.info('Get page header')
-        return self.find_element(*self.page_header_loc).text
+        return self.find_element(*self.__page_header_loc).text
 
     #title locator
     __page_title_loc = (By.CSS_SELECTOR, 'span[data-hj-test-id="hj-active-page-title"]')

@@ -101,12 +101,12 @@ class Base(object):
         logger.debug(r'wait UI %s by %s' %(locators[0][1], locators[0][0]))
         return WebDriverWait(self.driver, self.timeout, 0.5).until(EC.visibility_of_element_located(*locators))
 
-    def close_browser(self,driver):
+    def quit_browser(self):
         '''
         Close the browser
         :param driver: brwoser instance
         :return: 
         '''
         logger.debug('Close the browser')
-        driver.quit()
+        self.driver.close()
 
