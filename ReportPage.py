@@ -3,11 +3,15 @@
 #Filename: ReportPage.py
 
 from BasePage import BasePage
+from LoginPage import LoginPage
+from SearchPage import  SearchPage
+from MenuBar import MenuBar
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchAttributeException, NoSuchElementException
+from robot.api import logger
 import time
 
 class ReportPage(BasePage):
@@ -59,6 +63,7 @@ class ReportPage(BasePage):
         :param button_name: str: button name
         :return:
         '''
+        logger.debug('click %s in context-action' %button_name)
         buttons = self.find_elements(*self.__context_action_buttons_loc)
         if len(buttons):
             for button in buttons:  # Go throug buttons not in dorpdown.
@@ -76,6 +81,7 @@ class ReportPage(BasePage):
         '''
         # if group is None:
         #     super(ReportPage,self).action_page_click_button(button_name)
+        logger.info('click button %s' %button_name)
         if group == 'page-action':
             super(ReportPage,self).action_page_click_button(button_name)
             # self.__click_page_action_button(button_name)
@@ -96,6 +102,7 @@ class ReportPage(BasePage):
         Return a list of header elements
         :return: a list of header elements
         '''
+        logger.debug("Get table's header elements")
         page_wrap = self.get_current_page_wrap()
         headers_container = self.find_child_element(page_wrap,*self.__table_header_container_loc)
         headers = self.find_child_elements(headers_container, *self.__table_headers_loc)
@@ -112,7 +119,9 @@ class ReportPage(BasePage):
         :param detail_name: string: the name of the row detail table
         :return: a list of table rows
         '''
+        logger.debug('Get table rows elements')
         if detail_name is not None:
+            logger.debug('Get table rows in table %s' %detail_name)
             rowdetail_table = self.__get_rowdetail_table_element(detail_name)
             table_rows = self.find_child_elements(rowdetail_table, *self.__rowdetail_row_loc)
             if len(table_rows):
@@ -121,6 +130,7 @@ class ReportPage(BasePage):
             else:
                 raise NoSuchElementException('rows in row detail table are not located')
         else:
+            logger.debug('Get rows in master table')
             page_wrap = self.get_current_page_wrap()
             table_rows = self.find_child_elements(page_wrap,*self.__table_row_loc)
             if len(table_rows):
@@ -140,8 +150,10 @@ class ReportPage(BasePage):
         :param detail_name: string, the name of the row detail table
         :return: a list of tabel cells, include + cell
         '''
+        logger.debug('Get tabel cell elements')
         table = []
         if detail_name is not None:
+            logger.debug('Get table cell in table %s' %detail_name)
             table_rows = self.__get_table_row_elements(detail_name)
             for row in table_rows:
                 cells = self.find_child_elements(row, *self.__rowdetail_cell_loc)
@@ -153,6 +165,7 @@ class ReportPage(BasePage):
                     raise NoSuchElementException('<td> cells in row detial table not located')
             return table
         else:
+            logger.debug('Get tabel cells in master table')
             tabel_rows = self.__get_table_row_elements()
             for row in tabel_rows:
                 cells = self.find_child_elements(row, *self.__table_cell_loc) #get cell elements of each row
@@ -172,10 +185,13 @@ class ReportPage(BasePage):
         :param detail_name: string: the name of the row detail table
         :return: a list of headers' name
         '''
+        logger.info('Get list of headers name')
         if detail_name is not None:
+            logger.debug('Get headers elements in table %s' %detail_name)
             rowdetail = self.__get_rowdetail_table_element(detail_name)
             headers = self.find_child_elements(rowdetail, *self.__table_headers_loc)
         else:
+            logger.debug('Get headers elements in master table')
             headers = self.__get_header_elements()
         if len(headers):
             header_values=[]
@@ -193,6 +209,7 @@ class ReportPage(BasePage):
         :param detail_name: string:　the name of the row detail table
         :return: a list of values in a specific row, include row number cell
         '''
+        logger.info('Get list of cell values in row %d' %row)
         table = self.__get_table_cell_elements(detail_name)
         if not isinstance(row, int):
             raise ValueError ('row must be int')
@@ -287,6 +304,71 @@ class ReportPage(BasePage):
                 index+=1
         raise NoSuchElementException('detail row icon does not exist')
 
+if __name__ == '__main__':
+    webdriver = webdriver.Firefox()
+    webdriver.maximize_window()
+    webdriver.implicitly_wait(10)
+    login_page = LoginPage(webdriver)
+    login_page.login()
+    menu_bar = MenuBar(webdriver)
+    menu_bar.wait_UI(menu_bar.menu_button_loc)
+    menu_bar.action_toggle_menu()
+    time.sleep(1)
+    menu_bar.action_expand_app_group('Supply Chain Advantage')
+    menu_bar.action_expand_menu('Advantage Dashboard')
+    menu_bar.action_expand_menu('Receiving')
+    menu_bar.action_expand_menu('ASNs', False)
+    searchPage = SearchPage(webdriver)
+    searchPage.wait_page('Search ASNs')
+    print(searchPage.get_page_title())
+    # time.sleep(1)
+    print(searchPage.get_all_labels_name(1))
+    searchPage.action_dropdown_select('Warehouse ID', 'Warehouse2 - Warehouse 02')
+    # searchPage.action_checkbox_check('Search by Date')
+    searchPage.action_searchlike_input('ASN Number', 'ASN2')
+    searchPage.action_page_click_button('Query')
+    reportPage = ReportPage(webdriver)
+    reportPage.wait_page('ASNs')
+    print(reportPage.get_page_title())
+    print (reportPage.get_headers())
+    list = reportPage.get_values_by_row(1)
+    print(list)
+    reportPage.action_cell_click(1, 1)
+    print(reportPage.get_rowdetail_titles())
+    reportPage.action_extend_rowdetail('ASN DETAILS')
+    print (reportPage.get_headers('ASN DETAILS'))
+    print (reportPage.get_values_by_row(1, 'ASN DETAILS'))
+    reportPage.action_cell_click(1, 1, 'ASN DETAILS')
+    searchPage2 = SearchPage(webdriver)
+    searchPage2.wait_page('Edit ASN Detail for ASN2 in Warehouse 02')
+    print(searchPage2.get_page_title())
+    searchPage2.action_page_click_button('Delete')
+    searchPage2.action_errordialog_click_button('Dismiss')
+    searchPage.action_edit_clear('*PO Number')
+    searchPage.action_page_click_button('Update')
+    print(searchPage.get_page_error())
+    print(searchPage.get_field_errors())
+    menu_bar.action_toggle_menu()
+    time.sleep(1)
+    menu_bar.action_collapse_menu('Advantage Dashboard')
+    time.sleep(1)
+    menu_bar.action_expand_menu('Receiving')
+    menu_bar.action_expand_menu('Unknown Receipts')
+    menu_bar.action_expand_menu('Resolve Unknown Receipts', False)
+    reportPage2 = ReportPage(webdriver)
+    reportPage2.wait_page('Resolve Unknown Receipts')
+    # time.sleep(3)
+    reportPage2.action_cell_click(1, 1)
+    editPage = EditPage(webdriver)
+    editPage.wait_page('Edit Resolve Unknown Receipt')
+    editPage.action_dropdown_select('Carrier Name', 'DHL', 1)
+    editPage.action_dropdown_select('Status', 'Resolved', 2)
+    editPage.action_multiedit_input('Resolution Comment', 'comment', 2)
+    editPage.action_page_click_button('Delete')
+    print(editPage.get_infodialog_header())
+    print(editPage.get_infodialog_title())
+    print(editPage.get_infodialog_message())
+    editPage.action_infodialog_click_button('Cancel')
 
 
 

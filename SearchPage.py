@@ -3,6 +3,8 @@
 #Filename: SearchPage.py
 
 from BasePage import BasePage
+from LoginPage import LoginPage
+from MenuBar import MenuBar
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchAttributeException, NoSuchElementException
@@ -459,6 +461,34 @@ class SearchPage(BasePage):
             error_messages.append(error.text)
         return error_messages
 
+if __name__ == '__main__':
+    webdriver = webdriver.Firefox()
+    webdriver.maximize_window()
+    webdriver.implicitly_wait(10)
+    login_page = LoginPage(webdriver)
+    login_page.login()
+    menu_bar = MenuBar(webdriver)
+    menu_bar.wait_UI(menu_bar.menu_button_loc)
+    menu_bar.action_toggle_menu()
+    time.sleep(1)
+    menu_bar.action_expand_app_group('Supply Chain Advantage')
+    menu_bar.action_expand_menu('Advantage Dashboard')
+    menu_bar.action_expand_menu('searchTest', False, 'search test')
+    searchPage = SearchPage(webdriver)
+    print(searchPage.get_page_title())
+    time.sleep(1)
+    print (searchPage.get_all_labels_name(1))
+    searchPage.action_searchlike_input('searchLike','abc',2,'Exactly')
+    searchPage.action_listbox_select('ListBox','Warehouse 02', 2)
+    searchPage.action_checkbox_check('checkbox2',2)
+    searchPage.action_dropdown_input('time','1:30 AM',2)
+    menu_bar.action_toggle_menu()
+    time.sleep(1)
+    menu_bar.action_expand_menu('Inventory')
+    menu_bar.action_expand_menu('Inventory Snapshot', False, 'Inventory Snapshot')
+    searchPage.action_page_click_button('Create Snapshot')
+    print(searchPage.get_errordialog_message())
+    searchPage.action_errordialog_click_button('Dismiss')
 
 
 

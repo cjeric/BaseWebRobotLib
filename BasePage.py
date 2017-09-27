@@ -44,7 +44,8 @@ class BasePage(_Base):
         '''
         logger.info('Get page title')
         title = self.wait_UI(self.__page_title_loc)
-        return self.find_element(*self.__page_title_loc).text
+        logger.debug('page title is %s' % title.text)
+        return title.text
 
     # __footertext_loc = (By.CSS_SELECTOR, 'span.footer-text')
 
@@ -58,6 +59,7 @@ class BasePage(_Base):
         for i in range(self.timeout):
             title = self.get_page_title()
             if page_title == title:
+                logger.debug('Page %s displays' % page_title)
                 return True
             else:
                 time.sleep(1)
@@ -232,7 +234,7 @@ class BasePage(_Base):
         :param button_name: string, the name of the button
         :return: None
         '''
-        logger.info('Click % button on error dialog' % button_name)
+        logger.info('Click %s button on error dialog' % button_name)
         buttons = self.__get_error_buttons()
         if len(buttons):
             for button in buttons:

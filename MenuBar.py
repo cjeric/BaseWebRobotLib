@@ -13,7 +13,7 @@ class MenuBar(BasePage):
 
 
     #Menu button locator
-    __menu_button_loc = (By.ID, 'menuButtonToggle')
+    menu_button_loc = (By.ID, 'menuButtonToggle')
 
     def action_toggle_menu(self):
         '''
@@ -21,7 +21,7 @@ class MenuBar(BasePage):
         :return: None
         '''
         logger.info('Toggle menu')
-        self.find_element(*self.__menu_button_loc).click()
+        self.find_element(*self.menu_button_loc).click()
 
     #Menu locators for different status
     menu_current_loc = (By.XPATH, '//nav[@id="menu"]/ul/li[@class="home current"]/a')
