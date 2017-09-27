@@ -5,8 +5,9 @@ from selenium import webdriver as _webdriver
 # a='a'
 
 def get_variables(*args):
-    print args
-    if args[0].lower() == 'ie':
+    if len(args) == 0:
+        driver = _webdriver.Firefox()
+    elif args[0].lower() == 'ie':
         print ('launch IE')
         driver = _webdriver.Ie()
     else:
