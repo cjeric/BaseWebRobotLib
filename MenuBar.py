@@ -88,6 +88,25 @@ class MenuBar(BasePage):
                     return
         raise NoSuchElementException('Fail to expand Menu or open page, %s not found' % menu)
 
+    def navi_to_page(self, group, page_title, *submenu_list):
+        '''
+        Navi to the page according to the provided menu path
+        :param group: app group name
+        :param page_title: page title
+        :param submenu_list: the list of menu path
+        :return: 
+        '''
+        self.action_toggle_menu()
+        time.sleep(1)
+        self.action_expand_app_group(group)
+        counter = 0
+        for item in submenu_list:
+            if counter == len(submenu_list) - 1:
+                self.action_expand_menu(submenu_list[counter], False, page_title)
+            else:
+                self.action_expand_menu(submenu_list[counter])
+                counter += 1
+
     #The locator of the current opened menu's parent menus
     __ancestor_menu_loctor = (By.XPATH, '//li[@class="with-children open ancestor"]/a')
 

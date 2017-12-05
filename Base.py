@@ -108,5 +108,5 @@ class Base(object):
         :return: 
         '''
         logger.debug('Close the browser')
-        self.driver.close()
+        self.driver.quit()
 

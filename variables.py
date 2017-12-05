@@ -14,5 +14,11 @@ def get_variables(*args):
         driver = _webdriver.Firefox()
     driver.implicitly_wait(10)
     driver.maximize_window()
-    variables = {'browser': driver}
+    user = 'chengjie_jack'
+    pwd = 'Eric890420WY'
+    smtp_server = 'smtp.126.com'
+    variables = {'browser': driver,
+                 'user': user,
+                 'pwd': pwd,
+                 'smtp_server': smtp_server}
     return variables

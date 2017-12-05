@@ -1,7 +1,8 @@
 *** Settings ***
-Library           WebAuto.MenuBar    ${browser}
+Library           Collections
+Library           WebAuto.CommonFunction.mail    ${user}    ${pwd}    ${smtp_server}
 
 *** Keywords ***
-NaviToPage
-    [Arguments]    @{menus}
-    action toggle menu
+MailTo
+    [Arguments]    ${tolist}    ${body}    ${header}    ${attachment}=${None}
+    send mail    ${tolist}    ${body}    ${header}    ${attachment}

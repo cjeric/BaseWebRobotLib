@@ -8,6 +8,7 @@ Library           WebAuto.SearchPage    ${browser}
 Library           WebAuto.Base    ${browser}
 Resource          BasePageWrapper.robot
 Library           WebAuto.ReportPage    ${browser}
+Resource          UserKeywords.robot
 
 *** Test Cases ***
 MenuDemo
