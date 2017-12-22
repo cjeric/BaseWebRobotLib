@@ -33,7 +33,7 @@ class MenuBar(BasePage):
         :return: None
         '''
         logger.info('Back to root of menu tree')
-        self.find_element(*self.__menu_ancestor_loc).click()
+        self.find_element(*self.menu_ancestor_loc).click()
 
     #Entry menu locator
     app_group_loc = (By.XPATH, '//nav[@id="menu"]/ul/li[@class="with-children closed"]/a')

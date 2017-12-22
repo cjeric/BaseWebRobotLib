@@ -1,6 +1,7 @@
 *** Settings ***
 Suite Setup       Login
 Suite Teardown    WebAuto.Base.quit_browser
+Test Teardown     reset menu
 Library           WebAuto.LoginPage    ${browser}
 Library           Selenium2Library
 Library           WebAuto.MenuBar    ${browser}
@@ -12,12 +13,7 @@ Resource          UserKeywords.robot
 
 *** Test Cases ***
 MenuDemo
-    action toggle menu
-    sleep    1
-    action expand app group    Supply Chain Advantage
-    action expand menu    Advantage Dashboard
-    action expand menu    Receiving
-    action expand menu    ASNs    ${false}
+    navi to page    Supply Chain Advantage    Search ASNs    Advantage Dashboard    Receiving    ASNs
     sleep    3
     action toggle menu
     sleep    1
@@ -25,11 +21,11 @@ MenuDemo
     action expand menu    Receiving
     action collapse menu    Supply Chain Advantage
     action backto menu
+    action toggle menu
+    [Teardown]
 
-search page
-    action expand app group    Supply Chain Advantage
-    action expand menu    Advantage Dashboard
-    action expand menu    searchTest    ${false}    search test
+SearchPage
+    navi to page    Supply Chain Advantage    search test    Advantage Dashboard    searchTest
     ${pagetitle}    get page title
     log    ${pagetitle}
     should be equal    ${pagetitle}    search test
@@ -47,13 +43,9 @@ search page
     log    ${errormessage}
     click errordialog button    Dismiss
 
-report page
-    action toggle menu
+ReportPage
+    navi to page    Supply Chain Advantage    Search ASNs    Advantage Dashboard    Receiving    ASNs
     sleep    1
-    action collapse menu    Supply Chain Advantage
-    action expand menu    Advantage Dashboard
-    action expand menu    Receiving
-    action expand menu    ASNs    ${false}    Search ASNs
     action dropdown select    Warehouse ID    Warehouse2 - Warehouse 02
     action searchlike input    ASN Number    ASN2
     click button    Query
@@ -70,3 +62,9 @@ report page
     log many    @{headers}
     log many    @{detailValues}
     action cell click    ${1}    ${1}    ASN DETAILS
+
+*** Keywords ***
+reset menu
+    action toggle menu
+    action backto menu
+    action toggle menu

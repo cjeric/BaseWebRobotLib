@@ -11,12 +11,12 @@ from email.header import Header
 
 class mail():
 
-    def __init__(self, user, pw, smtp_server):
+    def __init__(self,smtp_server, user=None, pw=None ):
         self.smtp_server = smtp_server
         self.user = user
         self.pw = pw
         postfix = smtp_server.split('.')
-        self.sender = user + '@' + postfix[-2] + '.' + postfix[-1]
+        self.sender = 'chengjie_jack@126.com'
 
     def send_mail(self, mail_tolist, body, subject, attachment = None):
         try:
@@ -29,7 +29,7 @@ class mail():
 
                 att1 = MIMEText(open(attachment,'rb').read(), 'base64', 'utf-8')
                 att1['Content-Type'] = 'application/octet-stream'
-                att1['Conent-Disposition'] = 'attachment; filename="log2.txt" ' #+ attachment.split('/')[-1]
+                att1['Content-Disposition'] = 'attachment; filename="results.html" ' #+ attachment.split('/')[-1]
                 msg.attach(att1)
 
             msg['to'] = mail_tolist
@@ -37,8 +37,10 @@ class mail():
             msg['subject'] = subject
 
             smpt = smtplib.SMTP(self.smtp_server)
-            smpt.login(self.user, self.pw)
+            if self.user:
+                smpt.login(self.user, self.pw)
             smpt.sendmail(self.sender, mail_tolist, msg.as_string())
+            print 'mail is sent'
 
         except Exception,e:
             print e
@@ -48,5 +50,5 @@ class mail():
 
 if __name__ == '__main__':
     file_path = r'C:\AutoResults\results.txt'
-    mailInstance = mail('chengjie_jack', 'Eric890420WY', 'smtp.126.com')
+    mailInstance = mail('internalmail.highjump.com')
     mailInstance.send_mail('jack.cheng@highjump.com', 'testresult', 'csd project', file_path)
