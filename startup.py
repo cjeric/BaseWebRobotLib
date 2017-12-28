@@ -18,7 +18,7 @@ mailtolist = 'jack.cheng@highjump.com'
 
 
 def run(command):
-    result = Popen(command, shell=True,stdin=PIPE,stdout=PIPE, stderr=PIPE)
+    result = Popen(command, shell=True,stdout=PIPE, stderr=PIPE)
     result.wait()
     stdout, stderr = result.communicate()
     return result, stdout, stderr
@@ -29,8 +29,9 @@ if __name__ == '__main__':
     command = 'robot ' + result_dir + ' ' + testcases_dir
     #result = run(command)
     result,stdout,stderr=run(command)
+    print stdout
     email = mail(smtp_server,user,pwd)
     email.send_mail(mailtolist, 'testresult', 'robot project', logfile_path)
-    print stdout
+
 
 

@@ -5,6 +5,7 @@
 import os
 import pyodbc
 import smtplib
+import time
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
@@ -17,45 +18,64 @@ class mail():
         self.pwd = pwd
         postfix = smtp_server.split('.')
         self.sender = 'chengjie_jack@126.com'
+        self.retry_counter = 0
 
-    def send_mail(self, mail_tolist, body, subject, *attachment):
+
+    def create_mail(self, mail_tolist, body, subject, *attachment):
         '''
-        Send mail
+        Create mail
         :param mail_tolist: a string, use , to divide multiple addres
         :param body: The text displayed in mail
         :param subject: subject of the mail
         :param attachment: attachments' path
         :return: 
         '''
+        if len(attachment):
+            msg = MIMEMultipart()
+            body = MIMEText(body, _subtype='plain', _charset='utf-8')
+            msg.attach(body)
+            for i in xrange (0,len(attachment)):
+                att = MIMEText(open(attachment[i], 'rb').read(), 'base64', 'utf-8')
+                att['Content-Type'] = 'application/octet-stream'
+                att['Content-Disposition'] = 'attachment; filename=" ' + attachment[i].split('\\')[-1] + '"'
+                msg.attach(att)
+        else:
+            msg = MIMEText(body, _subtype='plain', _charset='utf-8')
 
+        msg['to'] = mail_tolist
+        msg['from'] = self.sender
+        msg['subject'] = subject
+        return msg
+
+    def send(self, msg, mail_tolist):
         try:
-            if len(attachment):
-                msg = MIMEMultipart()
-                body = MIMEText(body, _subtype='plain', _charset='utf-8')
-                msg.attach(body)
-                for i in xrange (0,len(attachment)):
-                    att = MIMEText(open(attachment[i], 'rb').read(), 'base64', 'utf-8')
-                    att['Content-Type'] = 'application/octet-stream'
-                    att['Content-Disposition'] = 'attachment; filename=" ' + attachment[i].split('/')[-1] + '"'
-                    msg.attach(att)
-            else:
-                msg = MIMEText(body, _subtype='plain', _charset='utf-8')
-
-            msg['to'] = mail_tolist
-            msg['from'] = self.sender
-            msg['subject'] = subject
-
             smpt = smtplib.SMTP(self.smtp_server)
             if self.user:
                 smpt.login(self.user, self.pwd)
             smpt.sendmail(self.sender, mail_tolist, msg.as_string())
-            print 'mail is sent'
-
-        except Exception,e:
+        except smtplib.SMTPAuthenticationError,e:
             print e
-
+            if self.retry_counter < 3:
+                self.retry_counter += 1
+                smpt.close()
+                print 'Retry after 3 seconds'
+                time.sleep(3)
+                self.send(msg, mail_tolist)
+            else:
+                self.retry_counter=0
+                print 'Check email username and password'
+                raise
+        except Exception,e:
+            raise
+        else:
+            print 'mail is sent'
         finally:
             smpt.close()
+
+    def send_mail(self,mail_tolist, body, subject, *attachment):
+        print 'Trying to send email'
+        msg = self.create_mail(mail_tolist,body,subject,*attachment)
+        self.send(msg, mail_tolist)
 
 class sql():
 
