@@ -14,7 +14,7 @@ outputfile_path = result_dir.split(' ')[1] + r'\output.xml'
 user = 'chengjie_jack'
 pwd = 'Eric890420WY'
 smtp_server = 'smtp.126.com'
-mailtolist = 'chengjie_jack@126.com'
+mailtolist = 'jack.cheng@highjump.com'
 
 
 def run(command):
